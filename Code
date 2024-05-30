@@ -1,0 +1,354 @@
+package javaapplication13;
+
+
+/**
+ * File header comment (program description)
+ * This program features the ScreenSaverPanel class which extends JPanel and implements KeyListener (and features paintComponent). 
+ * A number of packages are imported to facilitate the function of the program (lines ~12-28).
+ * The design features 4 pacman characters which travel in a controlled fashion across the screen (2 going left-right, 2 going right to left).
+ * These characters were manually constructed using fillarc commands.
+ * The pacman characters were all set to different colours and the fillarc and similar functions were adjusted to change the direction of the mouth for the two characters travelling from right to left.
+ * The pacman characters were made to travel from right to left by manipulating the drawstring and fillarc commands.
+ * The UL logo is also displayed in the middle of the screen, which is an image off the internet (https://www.google.com/url?sa=i&url=https%3A%2F%2Fbds.ul.ie%2F&psig=AOvVaw1s0TXtfewy8h4MvkAogYO5&ust=1681331120078000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKixkdPUov4CFQAAAAAdAAAAABAE).
+ * The pacman characters are shown to chase important information including the students student id, name, the module title, and module code.
+ * The pacman characters are being chased by pacman ghosts, all of different colours.
+ * These images are all stored in a folder called pacmanimages.
+ * The pacman ghosts can be found in the following links: red https://www.google.com/url?sa=i&url=http%3A%2F%2Fclipart-library.com%2Fclipart%2F1865480.htm&psig=AOvVaw1X8tlxMN4FjfiFF8M7hSbt&ust=1681331301453000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKjdoarVov4CFQAAAAAdAAAAABAE
+ * orange: https://www.google.com/url?sa=i&url=https%3A%2F%2Ffavpng.com%2Fpng_view%2Fclass-board-ms-pac-man-ghosts-png%2FUniufu1K&psig=AOvVaw1cli2LyzFUyNyEsR-KdscV&ust=1681331351918000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCPiE0sHVov4CFQAAAAAdAAAAABAE
+ * blue: https://www.google.com/imgres?imgurl=https%3A%2F%2Fi.seadn.io%2Fgae%2F2p6_M8lbocECBfV3Rwo7YNgxOHcCCdDAISxadU0xSCLj_hYwvfdgzXqFNJXuAD47H-LwEjaOIqEcCOZib1DQz6yCFdUq2NMO3hkS5X0%3Fauto%3Dformat%26w%3D1000&tbnid=Yvv70Ya7Ke43fM&vet=12ahUKEwjd6uPX1aL-AhVdRkEAHe74CMkQMygfegUIARCOAg..i&imgrefurl=https%3A%2F%2Fopensea.io%2Fassets%2Fethereum%2F0x495f947276749ce646f68ac8c248420045cb7b5e%2F39193729682816077196739080139982695497693607517966354645505785665978902773761&docid=0VSNomIDuEaHsM&w=1000&h=1000&q=pacman%20ghost%20blue%20&ved=2ahUKEwjd6uPX1aL-AhVdRkEAHe74CMkQMygfegUIARCOAg
+ * pink: https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.giantbomb.com%2Fa%2Fuploads%2Fscale_small%2F8%2F87790%2F2469744-pinky.png&tbnid=PHXNR76Y5wKpqM&vet=12ahUKEwiDjebt1aL-AhXvSEEAHeUfDGgQMygAegUIARDEAQ..i&imgrefurl=https%3A%2F%2Fwww.giantbomb.com%2Fpinky%2F3005-144%2F&docid=67ABflxFD6y4JM&w=300&h=300&q=pacman%20ghostpink&ved=2ahUKEwiDjebt1aL-AhXvSEEAHeUfDGgQMygAegUIARDEAQ
+ * The program also displays randomly generated rectangles of various colours on the screen, which show a dynamic/random movement in comparison to the controlled movement of the pacman characters.
+ * the paintComponent method declares many variables that are used to randomly generate the shapes of the rectangles.
+ * a try catch loop is used to attempt to load the aforementioned images, and an error message is displayed if this is not possible.
+ * The various pacman characters and rectangles are then drawn, and colours set. 
+ * static class ScreenSaverMouseListener extends MouseAdapter and is used to create mouse listeners for movement and the mouse being pressed to stop the screensaver.
+ * static class ScreenSaverKeyListener extends KeyAdapter and is used to create key listener so that when any key on the keybaord is pressed the screensaver is stopped.
+ * So in total this program has 3 ways to end the screensaver. 
+ * The main method adds the listeners and adds a delay for the refresh rate of the screen.
+ * It also maximises the screen and displays it properly.
+ * The screensaver panel is set to black for clarity.
+ * @author joelkavanagh(22336168)
+ * @version 23/03/23
+ */
+
+import java.awt.event.MouseEvent;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.util.Random;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.imageio.ImageIO;
+
+
+public class ScreenSaverPanel extends JPanel implements KeyListener  {
+    // Declare instance variables and constants for a PacMan like Object
+ 
+ int min = 0;
+ int max = 200; 
+ int random_int = (int)Math.floor(Math.random() * (max - min + 1) + min);
+    
+    
+ private int xPac;// = (0 + random_int);
+ private int yPac;// = (1000 - random_int);
+
+ private int pacMouthSize = 90;
+ private int pacMouthSize1 = 115; // Mouth open (degrees), toggle 90 to 45
+ private final int X_PAC_DELTA = 90; // Delta x Move for PAC/screen refresh
+ private final int PAC_SIZE = 100; // Diameter (bounding box size)
+ private final Random rng = new Random(); // Random Number Generator
+ private static final JFrame frame = new JFrame("Screensaver");
+ 
+
+
+
+ 
+ /*
+ 
+ This paintCompoent method declares and inititialises many variables (xPos1-4, yPos1-4, width, height etc) that are used for the construction of the random rectangles and the pacmen using the random number generator that had been declared above.
+ a try catch loop is used to attempt to load the aforementioned images, and an error message is displayed if this is not possible.
+ The images are taken out of the pacmanimages folder which includes 4 ghosts of different colours and the UL logo.
+ the images are then displayed using the g2d.drawimage function (if the try block works).
+ The current date and time is then created and displayed in an improved format.
+ if statements are used to ensure the size of the randomly generated rectangles are not too small.
+ various colours are then set and the pacmen and random rectangles are drawn.
+ Strings of important info are drawn in front of the pacmen as if theybwere chasing them including student id, student name, module code, and module name 
+ every second pacman character is shown to be going the opposite way across the screen, and their mouths are adjusted to make it seem they are going the other way.
+ the ghosts are displayed to chase their respective pacman across the screen.
+ 5 rectangles are drawn and redrawn continuously and randomly
+ @param g (graphics)
+ */
+ 
+ public void paintComponent(Graphics g) {
+ super.paintComponent(g);
+ int screenWidth = getWidth();
+ int screenHeight = getHeight();
+ g.setColor(Color.WHITE);
+ int xPos = rng.nextInt(screenWidth);
+ int xPos1 = rng.nextInt(screenWidth);
+ int xPos2 = rng.nextInt(screenWidth);
+ int xPos3 = rng.nextInt(screenWidth);
+ int xPos4 = rng.nextInt(screenWidth);
+ int yPos = rng.nextInt(screenHeight);
+ int yPos1 = rng.nextInt(screenHeight);
+ int yPos2 = rng.nextInt(screenHeight);
+ int yPos3 = rng.nextInt(screenHeight);
+ int yPos4 = rng.nextInt(screenHeight);
+ int width = rng.nextInt(400);
+ int height = rng.nextInt(400);
+ super.paintComponent(g);
+ Graphics2D g2d = (Graphics2D) g;
+ BufferedImage image;
+ 
+ try {
+     image = ImageIO.read(this.getClass().getResource("/pacmanimages/pacmanghost1.png"));
+     BufferedImage image2 = ImageIO.read(this.getClass().getResource("/pacmanimages/pacmanghost2.png"));
+     BufferedImage image3 = ImageIO.read(this.getClass().getResource("/pacmanimages/pacmanghost3.png"));
+     BufferedImage image4 = ImageIO.read(this.getClass().getResource("/pacmanimages/pacmanghost4.png"));
+     BufferedImage image5 = ImageIO.read(this.getClass().getResource("/pacmanimages/ULLogo.png"));
+    int imgHeight = getHeight()*1/12;
+    int imgWidth = image.getWidth() * imgHeight / image.getHeight();
+    int x = (getWidth() - imgHeight)/2;
+    int y = (getHeight() - imgWidth)/2;
+    //g2d.drawImage(image,xPac + PAC_SIZE/8, yPac + PAC_SIZE/8, null);
+    g2d.drawImage(image, xPac - (X_PAC_DELTA + 70) , yPac + 70, imgWidth, imgHeight, null);
+    g2d.drawImage(image2, (screenWidth - xPac) - (X_PAC_DELTA - 300) , yPac + 270, imgWidth, imgHeight, null);
+    g2d.drawImage(image3, xPac - (X_PAC_DELTA + 70) , yPac + 490, imgWidth, imgHeight, null);
+    g2d.drawImage(image4, (screenWidth - xPac) - (X_PAC_DELTA - 300) , yPac + 670, imgWidth, imgHeight, null);
+    
+    int x_pic = ((frame.getWidth()+670) - image.getWidth (null))/2 ;
+    int y_pic = (frame.getHeight() - image5.getHeight(null))/2;
+    g.drawImage(image5, x_pic, y_pic, null);
+    
+    
+  
+ } catch (IOException exc) {
+     System.err.println("Exception occured during image loading\n" + exc);
+ }
+ 
+ 
+ 
+ 
+ 
+ Date date = new Date();
+  String dateStr = new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(date);
+if (
+    width < 50) {
+    width = 50;
+}
+
+if (height < 50) {
+    height = 50;
+}
+
+ g.drawRect(xPos, yPos, width, height);
+ Font font = new Font("Arial", Font.PLAIN, 30);
+ g.setFont(font);
+ g.setColor(Color.WHITE);
+ FontMetrics fm = g.getFontMetrics(font);
+int textWidth = fm.stringWidth(dateStr);
+int textHeight = fm.getHeight();
+int textX = xPos + (width - textWidth) / 2;
+int textY = yPos + (height - textHeight) / 2 + fm.getAscent();
+g.drawString(dateStr,575, 300);
+ 
+ 
+ 
+  Font font1 = new Font("Arial", Font.PLAIN, 12);
+  g.setFont(font1);
+ g.setColor(Color.YELLOW);
+ g.drawRect(xPos1, yPos1, width, height);
+ g.fillArc(xPac, yPac + 50, PAC_SIZE, PAC_SIZE, pacMouthSize / 3, 360 - pacMouthSize);
+ g.setColor(Color.RED);
+ g.drawString("CE4702 ", (xPac+20) + PAC_SIZE, (yPac + 50) + PAC_SIZE/2);
+ 
+ 
+ 
+
+ g.fillArc((screenWidth - xPac), yPac + 250, PAC_SIZE,  PAC_SIZE, -135, 360 - pacMouthSize1);
+ xPac = (xPac < screenWidth) ? xPac + X_PAC_DELTA : 0; // Update xPac
+ g.setColor(Color.YELLOW);
+ g.drawString("Student Number 22336168 ", (screenWidth - (xPac + 160)) + PAC_SIZE, (yPac + 250) + PAC_SIZE/2);
+ 
+ g.setColor(Color.GREEN);
+ g.drawRect(xPos2, yPos2, width, height);
+ g.fillArc(xPac, yPac +460, PAC_SIZE, PAC_SIZE, pacMouthSize / 3, 360 - pacMouthSize);
+ g.setColor(Color.CYAN);
+ g.drawString("Student name Joel Kavanagh ", (xPac+20) + PAC_SIZE, (yPac + 470) + PAC_SIZE/2);
+ 
+ g.setColor(Color.BLUE);
+ g.drawRect(xPos3, yPos3, width, height);
+ g.fillArc((screenWidth - xPac), yPac +650, PAC_SIZE, PAC_SIZE,  -135, 360 - pacMouthSize1);
+ g.setColor(Color.WHITE);
+ g.drawString("Computer Software 2 ", (screenWidth - (xPac + 220)) + PAC_SIZE, (yPac + 650) + PAC_SIZE/2);
+ 
+ pacMouthSize = (pacMouthSize == 90) ? 45 : 90; // Close/Open mouth
+ pacMouthSize1 = (pacMouthSize1 == 90) ? 70 : 90; // Close/Open mouth
+ 
+ 
+ g.setColor(Color.RED);
+  g.drawRect(xPos4, yPos4, width, height);
+ 
+ }
+ 
+ /*
+ * The main method adds the listeners and adds a delay for the refresh rate of the screen.
+ It also maximises the screen and displays it properly.
+ It adds the panel to the frame, sets the frame default close operation, sets the frame window size, registers the frame
+ listeners and make it visible.
+ The screensaver panel is set to black for clarity.  
+ */
+ 
+ public static void main(String args[]) {
+
+ ScreenSaverMouseListener listener = new ScreenSaverMouseListener(frame);
+ frame.addMouseListener(listener);
+ frame.addMouseMotionListener(listener);
+
+ 
+  ScreenSaverKeyListener listener2 = new ScreenSaverKeyListener(frame);
+ 
+ frame.addKeyListener( listener2);
+ 
+  java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ScreenSaverPanel().setVisible(true);
+            }
+            });
+ ScreenSaverPanel screenSaverPanel = new ScreenSaverPanel();
+ screenSaverPanel.setBackground(Color.BLACK);
+ frame.add(screenSaverPanel);
+ frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // maximise window
+ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ frame.setUndecorated(true);
+ frame.setVisible(true); // display frame
+ do { // Redraw window continuously, with a short delay.
+ frame.repaint();
+ try {
+ Thread.sleep(700); // Delay the given ms
+ } catch (InterruptedException interruptedException) {
+ interruptedException.printStackTrace();
+ }
+ } while (true);
+ 
+ }
+ 
+@Override
+    public void keyPressed(KeyEvent e) {
+          try { //this adds a 1 second delay
+ Thread.sleep(1000);
+            }
+            catch (InterruptedException interruptedException) {
+ interruptedException.printStackTrace();
+            }
+                 System.exit(0);
+
+     } @Override
+     public void keyReleased(KeyEvent e){
+           // Do nothing
+ } @Override
+      public void keyTyped(KeyEvent e) {
+                  // Do nothing
+      }
+
+/*
+   This class extends MouseAdapter and is used to create mouse listeners for movement and the mouse being pressed to stop the screensaver.
+   it adds a 1 second delay between the listener picking up the user input and the program cancelling (screensaver ending).
+   both frame.dispose() and System.exit() are used to ensure that the screensaver is shut down properly.
+   try catch blocks are implemented to attempt to add this delay   
+      
+ */
+ 
+  static class ScreenSaverMouseListener extends MouseAdapter { //static so it can be accessed in main method, which is also static
+       
+      
+      private JFrame frame;
+     public ScreenSaverMouseListener(JFrame frame) {
+          this.frame = frame;
+          
+          /*
+          @param e (MouseEvent)
+          this adds the delay to the shutting off of the program using thread.sleep and a try catch block for the mouse being clicked
+          */
+     }
+    public void mouseClicked(MouseEvent e) {
+        if(e.getSource() instanceof JFrame) {
+            try { //this adds a 1 second delay
+ Thread.sleep(1000);
+            }
+            catch (InterruptedException interruptedException) {
+ interruptedException.printStackTrace();
+            }
+            ((JFrame) e.getSource()).dispose();
+            System.exit(0);
+        }
+    }
+    /*
+    @param e (MouseEvent)
+          this adds the delay to the shutting off of the program using thread.sleep and a try catch block for the mouse being moved
+    */
+    
+          
+      @Override
+     public void mouseMoved(MouseEvent e) {
+        try { //this adds a 1 second delay
+ Thread.sleep(1000);
+            }
+            catch (InterruptedException interruptedException) {
+ interruptedException.printStackTrace();
+            }
+         
+         frame.dispose();
+        System.exit(0);
+    }
+     }
+  
+  /*
+  static class ScreenSaverKeyListener extends KeyAdapter and is used to create key listener so that when any key on the keybaord is pressed the screensaver is stopped.
+  it adds a 1 second delay between the listener picking up the user input and the program cancelling (screensaver ending).
+  Thread.sleep is used to add that delay.
+  try catch blocks are implemented to attempt to add this delay
+  */
+
+ static class ScreenSaverKeyListener extends KeyAdapter { //static so it can be accessed in main method, which is also static
+       
+      
+      private JFrame frame;
+     public ScreenSaverKeyListener(JFrame frame) {
+          this.frame = frame;
+          
+          /*
+          @param e (KeyEvent)
+          this adds the delay to the shutting off of the program using thread.sleep and a try catch block for the keybaord being clicked
+          */
+     }
+    public void keyPressed(KeyEvent e) {
+        if(e.getSource() instanceof JFrame) {
+            try { //this adds a 1 second delay
+ Thread.sleep(1000);
+            }
+            catch (InterruptedException interruptedException) {
+ interruptedException.printStackTrace();
+            }
+            ((JFrame) e.getSource()).dispose();
+            System.exit(0);
+            
+        }
+    
+    }
+}
+
+
+
+}
+//end of program
+
